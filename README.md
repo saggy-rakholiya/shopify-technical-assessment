@@ -1,78 +1,46 @@
-# Shopify App Template - Extension only
+# Shopify Developer Technical Assessment
 
-This is a template for building an [extension-only Shopify app](https://shopify.dev/docs/apps/build/app-extensions/build-extension-only-app). It contains the basics for building a Shopify app that uses only app extensions.
+This repository contains the solution for the Shopify Technical Practical Test, focusing on Theme App Extensions and Checkout UI Extensions.
 
-This template doesn't include a server or the ability to embed a page in the Shopify Admin. If you want either of these capabilities, choose the [Remix app template](https://github.com/Shopify/shopify-app-template-remix) instead.
+## 🛠 Setup & CLI Commands Used
+To initialize and develop this project, the following Shopify CLI commands were used:
+- `npm init @shopify/app@latest`: To create the project structure.
+- `shopify app generate extension`: To generate both the Theme App Extension and Checkout UI Extension.
+- `shopify app dev`: Used for local development and previewing changes in a development store.
 
-Whether you choose to use this template or another one, you can use your preferred package manager and the Shopify CLI with [these steps](#installing-the-template).
+---
 
-## Benefits
+## 🚀 Scenario 1: Estimated Delivery Date (Theme App Extension)
+### Implementation Details:
+- **Logic:** I created a JavaScript helper function in `assets/delivery.js` that calculates a 2-day delivery window starting from a vendor-specific lead time.
+- **Data Handling:** Lead times are managed via a `vendor-config.json` file. This demonstrates a decoupled approach where data can be updated without touching the core logic.
+- **Defensive Coding:** The script includes a fallback to a "Default" lead time if a product's vendor is not explicitly defined in the configuration.
 
-Shopify apps are built on a variety of Shopify tools to create a great merchant experience. The [create an app](https://shopify.dev/docs/apps/getting-started/create) tutorial in our developer documentation will guide you through creating a Shopify app.
+---
 
-This app template does little more than install the CLI and scaffold a repository.
+## 📦 Scenario 2: Free Shipping Progress (Checkout UI Extension)
+### Implementation Details:
+- **Logic:** Extracted the calculation into a pure helper function `calculateRemaining`.
+- **Rounding:** Implemented `Math.ceil()` to ensure that the "amount remaining" is always rounded up to the nearest whole number, satisfying the requirement for clear customer communication.
+- **API Usage:** Utilized the `useSubtotalAmount` and `useCartLines` hooks from Shopify’s UI-extensions library to get real-time cart data.
 
-## Getting started
+---
 
-### Requirements
+## 📚 Resources Used (Research & Documentation)
+To ensure best practices and idiomatic Shopify development, I consulted the following resources:
+1. **Shopify Dev Docs:** [Theme App Extensions Overview](https://shopify.dev/docs/apps/online-store/theme-app-extensions) - Used to understand how to link assets and define schemas.
+2. **Shopify API Reference:** [Checkout UI Extensions Hooks](https://shopify.dev/docs/api/checkout-ui-extensions/unstable/react-hooks) - Consulted for `useSubtotalAmount` implementation.
+3. **MDN Web Docs:** [Math.ceil() Reference](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/ceil) - Used for rounding logic.
+4. **Liquid Reference:** [Asset URL Filters](https://shopify.dev/docs/api/liquid/filters/url-filters#asset_url) - To correctly link the JavaScript file in the Liquid block.
 
-1. You must [download and install Node.js](https://nodejs.org/en/download/) if you don't already have it.
-1. You must [create a Shopify partner account](https://partners.shopify.com/signup) if you don’t have one.
-1. You must create a store for testing if you don't have one, either a [development store](https://help.shopify.com/en/partners/dashboard/development-stores#create-a-development-store) or a [Shopify Plus sandbox store](https://help.shopify.com/en/partners/dashboard/managing-stores/plus-sandbox-store).
+---
 
-### Installing the template
+## 💡 Assumptions & Future Improvements
+- **Assumption:** I assumed that lead times provided in the JSON are in calendar days.
+- **Limitation:** In a live production app, vendor lead times would ideally be stored in **Metafields** or a custom database for easier merchant management.
+- **Improvement:** With more time, I would add unit tests using Jest for the `calculateDeliveryDates` and `calculateRemaining` helper functions.
 
-This template can be installed using your preferred package manager:
 
-Using yarn:
-
-```shell
-yarn create @shopify/app
-```
-
-Using npm:
-
-```shell
-npm init @shopify/app@latest
-```
-
-Using pnpm:
-
-```shell
-pnpm create @shopify/app@latest
-```
-
-This will clone the template and install the required dependencies.
-
-#### Local Development
-
-[The Shopify CLI](https://shopify.dev/docs/apps/tools/cli) connects to an app in your Partners dashboard. It provides environment variables and runs commands in parallel.
-
-You can develop locally using your preferred package manager. Run one of the following commands from the root of your app.
-
-Using yarn:
-
-```shell
-yarn dev
-```
-
-Using npm:
-
-```shell
-npm run dev
-```
-
-Using pnpm:
-
-```shell
-pnpm run dev
-```
-
-Open the URL generated in your console. Once you grant permission to the app, you can start development (such as generating extensions).
-
-## Developer resources
-
-- [Introduction to Shopify apps](https://shopify.dev/docs/apps/getting-started)
-- [App extensions](https://shopify.dev/docs/apps/build/app-extensions)
-- [Extension only apps](https://shopify.dev/docs/apps/build/app-extensions/build-extension-only-app)
-- [Shopify CLI](https://shopify.dev/docs/apps/tools/cli)
+git add .
+git commit -m "docs: add complete README with resources and design decisions"
+git push

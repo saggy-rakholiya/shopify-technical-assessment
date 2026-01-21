@@ -1,46 +1,60 @@
-# Shopify Developer Technical Assessment
+# Technical Assessment: Shopify Extensions Development
 
-This repository contains the solution for the Shopify Technical Practical Test, focusing on Theme App Extensions and Checkout UI Extensions.
+This project was built as part of a technical assessment to demonstrate proficiency with the Shopify CLI, Theme App Extensions, and Checkout UI Extensions.
 
-## 🛠 Setup & CLI Commands Used
-To initialize and develop this project, the following Shopify CLI commands were used:
-- `npm init @shopify/app@latest`: To create the project structure.
-- `shopify app generate extension`: To generate both the Theme App Extension and Checkout UI Extension.
-- `shopify app dev`: Used for local development and previewing changes in a development store.
+## 🛠 Setup & Development (CLI Commands)
+I followed the standard Shopify CLI workflow to build this project. Here are the steps I took in my terminal:
 
----
-
-## 🚀 Scenario 1: Estimated Delivery Date (Theme App Extension)
-### Implementation Details:
-- **Logic:** I created a JavaScript helper function in `assets/delivery.js` that calculates a 2-day delivery window starting from a vendor-specific lead time.
-- **Data Handling:** Lead times are managed via a `vendor-config.json` file. This demonstrates a decoupled approach where data can be updated without touching the core logic.
-- **Defensive Coding:** The script includes a fallback to a "Default" lead time if a product's vendor is not explicitly defined in the configuration.
+1. **Project Creation:** `npm init @shopify/app@latest` (Selected the Remix template for the app structure).
+2. **Extensions Setup:** `npx shopify app generate extension`
+   - First, I created the `delivery-timer` (Theme App Extension).
+   - Second, I created the `shipping-progress` (Checkout UI Extension).
+3. **Local Testing:** `npx shopify app dev` was used to sync the extensions with my development store for real-time testing.
 
 ---
 
-## 📦 Scenario 2: Free Shipping Progress (Checkout UI Extension)
-### Implementation Details:
-- **Logic:** Extracted the calculation into a pure helper function `calculateRemaining`.
-- **Rounding:** Implemented `Math.ceil()` to ensure that the "amount remaining" is always rounded up to the nearest whole number, satisfying the requirement for clear customer communication.
-- **API Usage:** Utilized the `useSubtotalAmount` and `useCartLines` hooks from Shopify’s UI-extensions library to get real-time cart data.
+## 📋 Assumptions & Design Decisions
+
+### General Approach:
+My main goal was to keep the logic outside of the UI components. This makes the code easier to maintain and follow.
+
+### Scenario 1 (Delivery Dates):
+- **Assumption:** I assumed that different brands (vendors) have different shipping speeds.
+- **Decision:** Instead of hardcoding dates, I used a JSON file (`vendor-config.json`). This is a more "Shopify-idiomatic" way because it allows the data to be managed separately from the Liquid code.
+- **UX:** I added a "Default" lead time. If a product doesn't have a specific vendor setup, the customer still sees a fallback date instead of a broken UI.
+
+### Scenario 2 (Free Shipping):
+- **Assumption:** The free shipping limit is a flat $100 across the store.
+- **Decision:** I used `Math.ceil()` for the calculation. Why? Because if a customer needs $5.01, telling them they need $6 is safer to ensure they actually cross the free shipping threshold after taxes/fees.
 
 ---
 
-## 📚 Resources Used (Research & Documentation)
-To ensure best practices and idiomatic Shopify development, I consulted the following resources:
-1. **Shopify Dev Docs:** [Theme App Extensions Overview](https://shopify.dev/docs/apps/online-store/theme-app-extensions) - Used to understand how to link assets and define schemas.
-2. **Shopify API Reference:** [Checkout UI Extensions Hooks](https://shopify.dev/docs/api/checkout-ui-extensions/unstable/react-hooks) - Consulted for `useSubtotalAmount` implementation.
-3. **MDN Web Docs:** [Math.ceil() Reference](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/ceil) - Used for rounding logic.
-4. **Liquid Reference:** [Asset URL Filters](https://shopify.dev/docs/api/liquid/filters/url-filters#asset_url) - To correctly link the JavaScript file in the Liquid block.
+## ⚙️ Data Flow & Logic
+
+### How Scenario 1 works:
+1. The **Liquid file** grabs the `product.vendor` from Shopify's object.
+2. It sends that name to my **JavaScript file** (`delivery.js`).
+3. The JS fetches the JSON config, finds the matching vendor, and calculates: `Today + Lead Time` to `Today + Lead Time + 2`.
+4. It then updates the HTML text on the product page.
+
+### How Scenario 2 works:
+1. I used the `@shopify/ui-extensions-react` library hooks.
+2. `useSubtotalAmount` gives us the live money in the cart.
+3. My logic function `calculateRemaining` subtracts the subtotal from $100.
+4. If the result is positive, it shows the "Add more" banner. If zero or negative, it shows the "Success" banner.
 
 ---
 
-## 💡 Assumptions & Future Improvements
-- **Assumption:** I assumed that lead times provided in the JSON are in calendar days.
-- **Limitation:** In a live production app, vendor lead times would ideally be stored in **Metafields** or a custom database for easier merchant management.
-- **Improvement:** With more time, I would add unit tests using Jest for the `calculateDeliveryDates` and `calculateRemaining` helper functions.
+## ⚠️ Limitations & Future Improvements
+1. **Hardcoded Values:** Right now, the $100 limit is a constant in the code. Ideally, I would use **App Metafields** so a merchant can change this limit from the Shopify Admin without touching code.
+2. **Translation:** The text is currently hardcoded in English. I would use Shopify's `i18n` framework to make it multi-language.
+3. **Date Logic:** My JS date logic is simple. For a real store, I would add logic to skip weekends (Saturdays/Sundays) for more accurate delivery dates.
 
+---
 
-git add .
-git commit -m "docs: add complete README with resources and design decisions"
-git push
+## 🔗 Resources Used (Google & Research)
+I used the following documentation to help with the syntax and Shopify-specific APIs:
+- **Shopify Dev Docs:** [Theme App Extension Blocks](https://shopify.dev/docs/apps/online-store/theme-app-extensions/ux/blocks) (Used for schema setup).
+- **Shopify API:** [Checkout UI Extension Hooks](https://shopify.dev/docs/api/checkout-ui-extensions/unstable/react-hooks) (To understand how to get the cart subtotal).
+- **MDN Web Docs:** [JavaScript Date Objects](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date) and [Math.ceil](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/ceil).
+- **StackOverflow:** Researching how to fetch local JSON assets within a Shopify extension environment.

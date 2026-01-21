@@ -1,0 +1,25 @@
+<div class="delivery-estimate" 
+     id="delivery-estimate-{{ block.id }}" 
+     data-vendor="{{ product.vendor }}"
+     style="color: {{ block.settings.text_color }}; padding: 15px 10px;">
+  
+  <span class="delivery-icon">🚚</span>
+  <span id="delivery-message">Calculating delivery...</span>
+</div>
+
+{% schema %}
+{
+  "name": "Delivery Estimate",
+  "target": "section",
+  "settings": [
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    }
+  ]
+}
+{% endschema %}
+
+<script src="{{ 'delivery.js' | asset_url }}" defer></script>

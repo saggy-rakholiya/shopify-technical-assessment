@@ -1,0 +1,6 @@
+{
+  "Soup Dumplings": { "leadTime": 2 },
+  "Potstickers": { "leadTime": 4 },
+  "Noodles": { "leadTime": 1 },
+  "Default": { "leadTime": 5 }
+}
